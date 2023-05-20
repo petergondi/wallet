@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 @Data
 @Entity
+@Table(name="transactions")
 public class TransactionDTO {
     @Id
     @GeneratedValue
