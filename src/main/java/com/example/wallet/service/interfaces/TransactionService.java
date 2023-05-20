@@ -5,7 +5,8 @@ import com.example.wallet.domain.walletpayload.WithdrawRequest;
 import com.example.wallet.domain.walletpayload.WithdrawResponse;
 
 public interface TransactionService {
-    Transaction createPayment(Transaction transaction);
+
+    Transaction savePayment(Transaction transaction);
 
     WithdrawResponse withDrawWallet(WithdrawRequest withdrawRequest);
 }

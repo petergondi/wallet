@@ -19,11 +19,10 @@ public class Transaction {
     private BigDecimal transFee;
     @PostLoad
     private void calculatedFields() {
-        double doubleValue = 0.1;
+        double doubleValue = 0.01;
         transFee = amount.multiply(BigDecimal.valueOf(doubleValue));
         amount=amount.subtract(transFee);
     }
-    private BigDecimal runningBalance;
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
