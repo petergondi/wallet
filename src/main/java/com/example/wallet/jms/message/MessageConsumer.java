@@ -6,11 +6,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
-@Component
-public class MessageConsumer  {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MessageConsumer.class);
-    @JmsListener(destination = "wallet-queue")
-    public void onMessage(Transaction transaction) {
-        LOGGER.info("Message received! {}", transaction);
-    }
-}
+//@Component
+//public class MessageConsumer  {
+//    private static final Logger LOGGER = LoggerFactory.getLogger(MessageConsumer.class);
+//    @JmsListener(destination = "wallet-queue")
+//    public void onMessage(Transaction transaction) {
+//        LOGGER.info("Message received! {}", transaction);
+//    }
+//}

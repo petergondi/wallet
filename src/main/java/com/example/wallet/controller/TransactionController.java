@@ -1,5 +1,6 @@
 package com.example.wallet.controller;
 
+import com.example.wallet.Util.TransactionStatus;
 import com.example.wallet.domain.Transaction;
 import com.example.wallet.domain.accountpayload.ResponsePayload;
 import com.example.wallet.domain.accountpayload.TransferPayload;
@@ -20,6 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class TransactionController {
     @Autowired
     TransactionService transactionService;
+    /**withdraw from the wallet
+      if success save the request to transaction table
+      insert the transaction into the queue
+    **/
     @PostMapping
     public ResponseEntity<ResponsePayload> accTransfer(@RequestBody TransferPayload transferPayload) {
         try {
@@ -27,20 +32,27 @@ public class TransactionController {
             withdrawRequest.setAmount(transferPayload.getAmount());
             withdrawRequest.setUser_id(transferPayload.getUserId());
             WithdrawResponse withdrawResponse=transactionService.withDrawWallet(withdrawRequest);
+            ResponsePayload responsePayload=new ResponsePayload();
             if(withdrawResponse!=null){
                 Transaction transaction=new Transaction();
                 transaction.setAmount(transferPayload.getAmount());
                 transaction.setUser_id(transferPayload.getUserId());
                 transaction.setWallet_transaction_id(withdrawResponse.getWalletTransactionId());
-                transaction.setStatus("RECEIVED");
+                transaction.setStatus(TransactionStatus.RECEIVED);
                 transactionService.savePayment(transaction);
 
+                responsePayload.setStatus(TransactionStatus.RECEIVED);
+                responsePayload.setTransactionId(withdrawResponse.getWalletTransactionId());
+                responsePayload.setAmount(transferPayload.getAmount());
+                responsePayload.setStatusDescription("Transaction Accepted for processing");
+                return new ResponseEntity<>(responsePayload, HttpStatus.CREATED);
             }
-            //withdraw from the wallet
-            //if success save the request to transaction table
-            //insert the transaction into the queue
-            //
-            return new ResponseEntity<>(saveUser, HttpStatus.CREATED);
+            responsePayload.setStatus(TransactionStatus.FAILED);
+            responsePayload.setAmount(transferPayload.getAmount());
+            responsePayload.setStatusDescription("Transaction Failed to initiate");
+            return new ResponseEntity<>(responsePayload, HttpStatus.BAD_REQUEST);
+
+
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }

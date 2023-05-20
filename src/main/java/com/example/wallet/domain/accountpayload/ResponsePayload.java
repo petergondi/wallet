@@ -1,10 +1,13 @@
 package com.example.wallet.domain.accountpayload;
 
-import java.math.BigDecimal;
+import com.example.wallet.Util.TransactionStatus;
+import lombok.Data;
 
+import java.math.BigDecimal;
+@Data
 public class ResponsePayload {
     private Long transactionId;
-    private String statusCode;
+    private TransactionStatus status;
     private BigDecimal amount;
     private String statusDescription;
 }
