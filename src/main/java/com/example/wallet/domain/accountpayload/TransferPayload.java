@@ -12,5 +12,6 @@ public class TransferPayload {
         private String lastName;
         private String nationalId;
         private Long userId;
+        private String currency;
         private BigDecimal amount;
 }

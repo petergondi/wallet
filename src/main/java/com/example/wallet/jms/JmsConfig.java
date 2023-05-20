@@ -1,4 +1,4 @@
-package com.example.wallet.jms.config;
+package com.example.wallet.jms;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

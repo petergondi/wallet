@@ -1,10 +1,11 @@
-package com.example.wallet.service.core;
+package com.example.wallet.service;
 
-import com.example.wallet.domain.Transaction;
+import com.example.wallet.domain.AccountDTO;
+import com.example.wallet.domain.TransactionDTO;
 import com.example.wallet.domain.walletpayload.WithdrawRequest;
 import com.example.wallet.domain.walletpayload.WithdrawResponse;
+import com.example.wallet.jms.MessagePublisher;
 import com.example.wallet.repository.TransactionRepository;
-import com.example.wallet.service.interfaces.TransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +19,15 @@ import org.springframework.web.client.RestTemplate;
 public class TransactionServiceImpl implements TransactionService {
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    private MessagePublisher messagePublisher;
     @Value("${ontop.wallet.url}")
     private String ontopUrl;
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
     @Override
-    public Transaction savePayment(Transaction transaction){
-        return transactionRepository.save(transaction);
+    public TransactionDTO savePayment(TransactionDTO transactionDTO){
+        return transactionRepository.save(transactionDTO);
     }
     @Override
     public WithdrawResponse withDrawWallet(WithdrawRequest withdrawRequest){
@@ -48,6 +51,11 @@ public class TransactionServiceImpl implements TransactionService {
             LOGGER.error("An error occurred: " + ex.getMessage());
         }
         return null;
+    }
+    @Override
+    public void saveToQueue(AccountDTO accountDTO){
+        messagePublisher.insertToQueue(accountDTO);
+
     }
 //    public void transferToaccount(){
 //        String url = "https://example.com/payment-endpoint"; // Replace with the actual endpoint URL

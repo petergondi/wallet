@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 @Data
 @Entity
-public class Transaction {
+public class TransactionDTO {
     @Id
     @GeneratedValue
     private Long wallet_transaction_id;
