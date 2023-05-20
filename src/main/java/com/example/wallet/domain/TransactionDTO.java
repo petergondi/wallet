@@ -1,5 +1,6 @@
 package com.example.wallet.domain;
 
+import com.example.wallet.Util.TransactionStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -9,21 +10,23 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 @Data
 @Entity
-public class Transaction {
+@Table(name="transactions")
+public class TransactionDTO {
     @Id
     @GeneratedValue
     private Long wallet_transaction_id;
     private Long user_id;
     private BigDecimal amount;
-    private String status;
+    private BigDecimal newamount;
+    @Enumerated(EnumType.STRING)
+    private TransactionStatus status;
     private BigDecimal transFee;
-    @PostLoad
+    @PrePersist
     private void calculatedFields() {
-        double doubleValue = 0.1;
+        double doubleValue = 0.01;
         transFee = amount.multiply(BigDecimal.valueOf(doubleValue));
-        amount=amount.subtract(transFee);
+        newamount=amount.subtract(transFee);
     }
-    private BigDecimal runningBalance;
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
