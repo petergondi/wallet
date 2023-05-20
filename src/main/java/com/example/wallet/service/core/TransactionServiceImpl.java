@@ -1,9 +1,8 @@
 package com.example.wallet.service.core;
 
 import com.example.wallet.domain.Transaction;
-import com.example.wallet.domain.request.WithdrawRequest;
-import com.example.wallet.domain.request.WithdrawResponse;
-import com.example.wallet.jms.message.MessageConsumer;
+import com.example.wallet.domain.walletpayload.WithdrawRequest;
+import com.example.wallet.domain.walletpayload.WithdrawResponse;
 import com.example.wallet.repository.TransactionRepository;
 import com.example.wallet.service.interfaces.TransactionService;
 import org.slf4j.Logger;
@@ -48,5 +47,6 @@ public class TransactionServiceImpl implements TransactionService {
         }
         return null;
     }
+
 
 }

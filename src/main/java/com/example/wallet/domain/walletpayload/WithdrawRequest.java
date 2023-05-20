@@ -1,4 +1,4 @@
-package com.example.wallet.domain.request;
+package com.example.wallet.domain.walletpayload;
 
 import lombok.Data;
 
