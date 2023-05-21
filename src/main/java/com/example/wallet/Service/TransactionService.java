@@ -3,9 +3,11 @@ package com.example.wallet.Service;
 import com.example.wallet.Domain.AccountDto;
 import com.example.wallet.Domain.AccountPayload.TransferPayload;
 import com.example.wallet.Domain.RecipientAccountDto;
+import com.example.wallet.Domain.ResponsePayload;
 import com.example.wallet.Domain.TransactionDto;
 import com.example.wallet.Domain.WalletPayload.WithdrawRequest;
 import com.example.wallet.Domain.WalletPayload.WithdrawResponse;
+import com.example.wallet.Util.TransactionStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,11 +21,13 @@ public interface TransactionService {
     @Transactional
     TransactionDto savePayment(TransferPayload transferPayload, WithdrawResponse withdrawResponse);
 
+    ResponsePayload createResponsePayload(TransactionStatus status, String statusDescription, BigDecimal amount);
+
     Page<TransactionDto> getFilteredTransactions(BigDecimal amount, LocalDate date, int page, int size);
 
     WithdrawResponse withDrawWallet(TransferPayload transferPayload);
 
-    void saveToQueue(TransactionDto transactionDto, TransferPayload transferPayload, RecipientAccountDto recipientAccountDto);
+    boolean saveToQueue(TransactionDto transactionDto, TransferPayload transferPayload, RecipientAccountDto recipientAccountDto);
 
     void transferToaccount(AccountDto accountDTO);
 }
