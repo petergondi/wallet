@@ -1,13 +1,15 @@
-package com.example.wallet.service;
+package com.example.wallet.Service;
 
+import com.example.wallet.Domain.RecipientAccountDto;
+import com.example.wallet.Repository.RecipientAcRepository;
 import com.example.wallet.Util.TransactionStatus;
-import com.example.wallet.domain.AccountDTO;
-import com.example.wallet.domain.TransactionDTO;
-import com.example.wallet.domain.accountpayload.TransferResponse;
-import com.example.wallet.domain.walletpayload.WithdrawRequest;
-import com.example.wallet.domain.walletpayload.WithdrawResponse;
-import com.example.wallet.jms.MessagePublisher;
-import com.example.wallet.repository.TransactionRepository;
+import com.example.wallet.Domain.AccountDto;
+import com.example.wallet.Domain.TransactionDto;
+import com.example.wallet.Domain.AccountPayload.TransferResponse;
+import com.example.wallet.Domain.WalletPayload.WithdrawRequest;
+import com.example.wallet.Domain.WalletPayload.WithdrawResponse;
+import com.example.wallet.Jms.MessagePublisher;
+import com.example.wallet.Repository.TransactionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,20 +49,20 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public TransactionDTO savePayment(TransactionDTO transactionDTO){
+    public TransactionDto savePayment(TransactionDto transactionDTO){
             return transactionRepository.save(transactionDTO);
     }
     @Override
-    public List<TransactionDTO> getTransactions(){
+    public List<TransactionDto> getTransactions(){
         return transactionRepository.findAll();
     }
     @Override
-    public Page<TransactionDTO> getFilteredTransactions(BigDecimal amount, LocalDate date, int page, int size) {
+    public Page<TransactionDto> getFilteredTransactions(BigDecimal amount, LocalDate date, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("creationAt").descending());
         return transactionRepository.findByAmountGreaterThanEqualAndCreatedAtGreaterThanEqual(amount, date, pageable);
     }
     public void updateTransaction(Long id, TransactionStatus transactionStatus){
-        Optional<TransactionDTO> transactionDTO=transactionRepository.findById(id);
+        Optional<TransactionDto> transactionDTO=transactionRepository.findById(id);
         if (transactionDTO.isPresent()) {
            transactionDTO.get().setStatus(transactionStatus);
             transactionRepository.save(transactionDTO.get());
@@ -90,18 +92,18 @@ public class TransactionServiceImpl implements TransactionService {
         return null;
     }
     @Override
-    public void saveToQueue(AccountDTO accountDTO){
+    public void saveToQueue(AccountDto accountDTO){
         messagePublisher.insertToQueue(accountDTO);
 
     }
     @Override
-    public void transferToaccount(AccountDTO accountDTO){
+    public void transferToaccount(AccountDto accountDTO){
         RestTemplate restTemplate = new RestTemplate();
         String url = ontopUrl+"/api/v1/payments";
         TransactionStatus transactionStatus=TransactionStatus.FAILED;
-        String recipientFullName=accountDTO.getTransferPayload().getFirstName()+" "+accountDTO.getTransferPayload().getLastName();
-        String recipientAcc=accountDTO.getTransferPayload().getAccountNo();
-        String recipientRouting=accountDTO.getTransferPayload().getRoutingNo();
+        String recipientFullName=accountDTO.getRecipientAccountDto().getFirstName()+" "+accountDTO.getRecipientAccountDto().getLastName();
+        String recipientAcc=accountDTO.getRecipientAccountDto().getAccountNo();
+        String recipientRouting=accountDTO.getRecipientAccountDto().getRoutingNumber();
         String currency=accountDTO.getTransferPayload().getCurrency();
         BigDecimal amount=accountDTO.getTransferPayload().getAmount();
         Long transactionId= accountDTO.getTransactionId();

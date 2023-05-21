@@ -1,4 +1,4 @@
-package com.example.wallet.domain;
+package com.example.wallet.Domain;
 
 import com.example.wallet.Util.TransactionStatus;
 import lombok.Data;

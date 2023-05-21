@@ -1,4 +1,4 @@
-package com.example.wallet.domain.accountpayload;
+package com.example.wallet.Domain.AccountPayload;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

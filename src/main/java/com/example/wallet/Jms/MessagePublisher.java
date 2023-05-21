@@ -1,7 +1,6 @@
-package com.example.wallet.jms;
+package com.example.wallet.Jms;
 
-import com.example.wallet.domain.AccountDTO;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.wallet.Domain.AccountDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,7 @@ public class MessagePublisher {
     @Autowired
     private JmsTemplate jmsTemplate;
     private static final Logger LOGGER = LoggerFactory.getLogger(MessagePublisher.class);
-    public void insertToQueue(AccountDTO accountDTO) {
+    public void insertToQueue(AccountDto accountDTO) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             String jsonPayload = objectMapper.writeValueAsString(accountDTO);

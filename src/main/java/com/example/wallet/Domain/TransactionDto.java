@@ -1,4 +1,4 @@
-package com.example.wallet.domain;
+package com.example.wallet.Domain;
 
 import com.example.wallet.Util.TransactionStatus;
 import jakarta.persistence.*;
@@ -11,13 +11,14 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name="transactions")
-public class TransactionDTO {
+public class TransactionDto {
     @Id
     @GeneratedValue
-    private Long wallet_transaction_id;
-    private Long user_id;
+    private Long walletTransactionId;
+    private Long userId;
     private BigDecimal amount;
-    private BigDecimal newamount;
+    private Long accountId;
+    private BigDecimal newAmount;
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;
     private BigDecimal transFee;
@@ -25,7 +26,7 @@ public class TransactionDTO {
     private void calculatedFields() {
         double doubleValue = 0.01;
         transFee = amount.multiply(BigDecimal.valueOf(doubleValue));
-        newamount=amount.subtract(transFee);
+        newAmount=amount.subtract(transFee);
     }
     @CreationTimestamp
     @Column(name = "created_at")
