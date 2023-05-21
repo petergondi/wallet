@@ -1,7 +1,7 @@
-package com.example.wallet.jms;
+package com.example.wallet.Jms;
 
-import com.example.wallet.domain.AccountDTO;
-import com.example.wallet.service.TransactionService;
+import com.example.wallet.Domain.AccountDto;
+import com.example.wallet.Service.TransactionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,7 @@ public class MessageConsumer  {
     @JmsListener(destination = "wallet-queue")
     public void onMessage(String message) {
         try {
-            AccountDTO accountDTO = objectMapper.readValue(message, AccountDTO.class);
+            AccountDto accountDTO = objectMapper.readValue(message, AccountDto.class);
             transactionService.transferToaccount(accountDTO);
             LOGGER.info("Message received! {}", accountDTO);
         }catch(Exception e){
