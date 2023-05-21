@@ -3,11 +3,9 @@ package com.example.wallet.Controller;
 import com.example.wallet.Domain.RecipientAccountDto;
 import com.example.wallet.Service.RecipientAcService;
 import com.example.wallet.Util.TransactionStatus;
-import com.example.wallet.Domain.AccountDto;
 import com.example.wallet.Domain.TransactionDto;
 import com.example.wallet.Domain.ResponsePayload;
 import com.example.wallet.Domain.AccountPayload.TransferPayload;
-import com.example.wallet.Domain.WalletPayload.WithdrawRequest;
 import com.example.wallet.Domain.WalletPayload.WithdrawResponse;
 import com.example.wallet.Service.TransactionService;
 import org.slf4j.Logger;
@@ -22,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 
 @RestController
@@ -48,19 +48,11 @@ public class TransactionController {
                 responsePayload.setStatusDescription("Transaction rejected A/C not found!");
                 return new ResponseEntity<>(responsePayload, HttpStatus.BAD_REQUEST);
             }
-            WithdrawRequest withdrawRequest=new WithdrawRequest();
-            withdrawRequest.setAmount(transferPayload.getAmount());
-            withdrawRequest.setUser_id(transferPayload.getUserId());
-            WithdrawResponse withdrawResponse=transactionService.withDrawWallet(withdrawRequest);
+            WithdrawResponse withdrawResponse=transactionService.withDrawWallet(transferPayload);
 
             if(withdrawResponse!=null){
                 //save transaction to database
-                TransactionDto transactionDTO =new TransactionDto();
-                transactionDTO.setAmount(transferPayload.getAmount());
-                transactionDTO.setUserId(transferPayload.getUserId());
-                transactionDTO.setWalletTransactionId(withdrawResponse.getWalletTransactionId());
-                transactionDTO.setStatus(TransactionStatus.RECEIVED);
-                TransactionDto savedTransactionDto =transactionService.savePayment(transactionDTO);
+                TransactionDto savedTransactionDto =transactionService.savePayment(transferPayload,withdrawResponse);
                 LOGGER.info("SAVED DETAILS"+ savedTransactionDto);
 
                 //prepare response to client
@@ -70,13 +62,9 @@ public class TransactionController {
                 responsePayload.setStatusDescription("Transaction Accepted for processing");
 
                 //prepare to insert to queue
+                //we are updating the new fee amount to be transferred after calculation
                 transferPayload.setAmount(savedTransactionDto.getNewAmount());
-                AccountDto accountDTO=new AccountDto();
-                accountDTO.setTransactionId(savedTransactionDto.getWalletTransactionId());
-                accountDTO.setTransferPayload(transferPayload);
-                accountDTO.setRecipientAccountDto(recipientAccountDto);
-
-                transactionService.saveToQueue(accountDTO);
+                transactionService.saveToQueue(savedTransactionDto,transferPayload,recipientAccountDto);
                 return new ResponseEntity<>(responsePayload, HttpStatus.CREATED);
             }
             responsePayload.setStatus(TransactionStatus.FAILED);
@@ -87,12 +75,11 @@ public class TransactionController {
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
     @GetMapping
     public ResponseEntity<Page<TransactionDto>> getFilteredTransactions(
             @RequestParam(name = "amount") BigDecimal amount,
-            @RequestParam(name = "date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
+            @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size) {
         Page<TransactionDto> transactions = transactionService.getFilteredTransactions(amount, date, page, size);

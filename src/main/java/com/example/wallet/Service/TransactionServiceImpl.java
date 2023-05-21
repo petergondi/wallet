@@ -1,7 +1,7 @@
 package com.example.wallet.Service;
 
+import com.example.wallet.Domain.AccountPayload.TransferPayload;
 import com.example.wallet.Domain.RecipientAccountDto;
-import com.example.wallet.Repository.RecipientAcRepository;
 import com.example.wallet.Util.TransactionStatus;
 import com.example.wallet.Domain.AccountDto;
 import com.example.wallet.Domain.TransactionDto;
@@ -26,7 +26,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
 
 @Service
@@ -49,18 +50,23 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public TransactionDto savePayment(TransactionDto transactionDTO){
-            return transactionRepository.save(transactionDTO);
+    public TransactionDto savePayment(TransferPayload transferPayload, WithdrawResponse withdrawResponse){
+        TransactionDto transactionDTO =new TransactionDto();
+        transactionDTO.setAmount(transferPayload.getAmount());
+        transactionDTO.setUserId(transferPayload.getUserId());
+        transactionDTO.setWalletTransactionId(withdrawResponse.getWalletTransactionId());
+        transactionDTO.setStatus(TransactionStatus.RECEIVED);
+        return transactionRepository.save(transactionDTO);
     }
-    @Override
-    public List<TransactionDto> getTransactions(){
-        return transactionRepository.findAll();
-    }
-    @Override
+   @Override
     public Page<TransactionDto> getFilteredTransactions(BigDecimal amount, LocalDate date, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("creationAt").descending());
-        return transactionRepository.findByAmountGreaterThanEqualAndCreatedAtGreaterThanEqual(amount, date, pageable);
-    }
+       LocalDateTime startOfDay = date.atStartOfDay();
+       LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+
+       Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+       return transactionRepository.findByAmountAndCreatedAtBetween(amount, startOfDay, endOfDay, pageable);
+
+   }
     public void updateTransaction(Long id, TransactionStatus transactionStatus){
         Optional<TransactionDto> transactionDTO=transactionRepository.findById(id);
         if (transactionDTO.isPresent()) {
@@ -69,8 +75,12 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
     @Override
-    public WithdrawResponse withDrawWallet(WithdrawRequest withdrawRequest){
+    public WithdrawResponse withDrawWallet(TransferPayload transferPayload){
         try {
+            WithdrawRequest withdrawRequest=new WithdrawRequest();
+            withdrawRequest.setAmount(transferPayload.getAmount());
+            withdrawRequest.setUser_id(transferPayload.getUserId());
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<WithdrawRequest> requestEntity = new HttpEntity<>(withdrawRequest, headers);
@@ -92,7 +102,11 @@ public class TransactionServiceImpl implements TransactionService {
         return null;
     }
     @Override
-    public void saveToQueue(AccountDto accountDTO){
+    public void saveToQueue(TransactionDto transactionDto, TransferPayload transferPayload, RecipientAccountDto recipientAccountDto){
+        AccountDto accountDTO=new AccountDto();
+        accountDTO.setTransactionId(transactionDto.getWalletTransactionId());
+        accountDTO.setTransferPayload(transferPayload);
+        accountDTO.setRecipientAccountDto(recipientAccountDto);
         messagePublisher.insertToQueue(accountDTO);
 
     }
