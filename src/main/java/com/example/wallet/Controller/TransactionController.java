@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 
 @RestController
@@ -40,42 +38,44 @@ public class TransactionController {
     @PostMapping
     public ResponseEntity<ResponsePayload> accTransfer(@RequestBody TransferPayload transferPayload) {
         try {
-            ResponsePayload responsePayload=new ResponsePayload();
-            RecipientAccountDto recipientAccountDto=recipientAcService.findAc(transferPayload.getAccountId());
-            if(recipientAccountDto==null){
-                responsePayload.setStatus(TransactionStatus.REJECTED);
-                responsePayload.setAmount(transferPayload.getAmount());
-                responsePayload.setStatusDescription("Transaction rejected A/C not found!");
-                return new ResponseEntity<>(responsePayload, HttpStatus.BAD_REQUEST);
+            RecipientAccountDto recipientAccountDto = recipientAcService.findAc(transferPayload.getAccountId());
+
+            if (recipientAccountDto == null) {
+                return ResponseEntity.badRequest()
+                        .body(transactionService.createResponsePayload(TransactionStatus.REJECTED, "Transaction rejected A/C not found!", transferPayload.getAmount()));
             }
-            WithdrawResponse withdrawResponse=transactionService.withDrawWallet(transferPayload);
 
-            if(withdrawResponse!=null){
-                //save transaction to database
-                TransactionDto savedTransactionDto =transactionService.savePayment(transferPayload,withdrawResponse);
-                LOGGER.info("SAVED DETAILS"+ savedTransactionDto);
+            WithdrawResponse withdrawResponse = transactionService.withDrawWallet(transferPayload);
 
-                //prepare response to client
-                responsePayload.setStatus(TransactionStatus.RECEIVED);
-                responsePayload.setTransactionId(savedTransactionDto.getWalletTransactionId());
-                responsePayload.setAmount(transferPayload.getAmount());
-                responsePayload.setStatusDescription("Transaction Accepted for processing");
+            if (withdrawResponse != null) {
+                TransactionDto savedTransactionDto = transactionService.savePayment(transferPayload, withdrawResponse);
 
-                //prepare to insert to queue
-                //we are updating the new fee amount to be transferred after calculation
-                transferPayload.setAmount(savedTransactionDto.getNewAmount());
-                transactionService.saveToQueue(savedTransactionDto,transferPayload,recipientAccountDto);
-                return new ResponseEntity<>(responsePayload, HttpStatus.CREATED);
+                if (savedTransactionDto != null) {
+                    ResponsePayload responsePayload = new ResponsePayload();
+                    responsePayload.setTransactionId(savedTransactionDto.getWalletTransactionId());
+                    transferPayload.setAmount(savedTransactionDto.getNewAmount());
+                    boolean insertToQueue = transactionService.saveToQueue(savedTransactionDto, transferPayload, recipientAccountDto);
+
+                    if (insertToQueue) {
+                        return ResponseEntity.ok()
+                                .body(transactionService.createResponsePayload(TransactionStatus.RECEIVED, "Transaction Accepted for processing!", transferPayload.getAmount()));
+                    } else {
+                        return ResponseEntity.ok()
+                                .body(transactionService.createResponsePayload(TransactionStatus.REFUND, "Transaction failed refund initiated!", transferPayload.getAmount()));
+                    }
+                } else {
+                    return ResponseEntity.ok()
+                            .body(transactionService.createResponsePayload(TransactionStatus.REFUND, "Transaction Could not be completed refund initiated!", transferPayload.getAmount()));
+                }
             }
-            responsePayload.setStatus(TransactionStatus.FAILED);
-            responsePayload.setAmount(transferPayload.getAmount());
-            responsePayload.setStatusDescription("Transaction Failed to initiate");
-            return new ResponseEntity<>(responsePayload, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest()
+                    .body(transactionService.createResponsePayload(TransactionStatus.FAILED, "Transaction Could not be processed refund initiated!", transferPayload.getAmount()));
 
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @GetMapping
     public ResponseEntity<Page<TransactionDto>> getFilteredTransactions(
             @RequestParam(name = "amount") BigDecimal amount,
