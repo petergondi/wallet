@@ -6,14 +6,27 @@
 ## 1.Api Design and Flow
 * System Diagram
 ![System Diagram](https://i.postimg.cc/yN5K1TGK/Ontop-1.png)
-
+* **System Diagram Flow Explanation** 
+- The virtual wallet is a simple digital wallet that holds users' virtaul money that they can later choose to transfer to their mobile account
+* Diagram Explanation(The numbers indicates the order of flow in the diagram)
+- 1.The end user initiates transfer request from their wallet to their bank account
+- 2.The wallet Service receives the request and initiates a debit request to the wallet
+- 3.The wallet service persist the information to the database
+- 4.The wallet service then adds the request to the queue for bank account crediting
+- 5.The Event Driven Consumer consumes the message from the queue
+- 6. The Event Driven Consumer sends crediting request to the external bank transfer Api
+- 7. The Event Driven Consumer receives the request back of the crediting result
+- 8. The Event Driven Consumer updates the corresponding transaction in the database appropriately
+*Refund and Retrial Section(Not Handled for now)
+- Refunds are supposed to be done if any of process 4,5,6 or 7 fails
+- A retrial mechanism may also be implemented before a refund is done especially if process 6 fails
 ## 2.Api Description
 This api is a simple simulation of a virtual wallet and how to transfer money from the virtual wallet to account number
 1) Create recipient account number;
 2) Send a transfer request using using the accountId created
 3) Query transactions in a filtered pattern 
 
-## 1 Description:
+### Description:
 - Summarized request paths and description for **recipient A/C creation**,**account transfer request** and **to query the transactions ordered by descending “creation date” in a paginated table and filtered by amount and date**
 
 | Method | Path                                                                              | Description                                                                                                         |
@@ -23,7 +36,7 @@ This api is a simple simulation of a virtual wallet and how to transfer money fr
 | GET    | /v1/transfer?amount={transAmount}&date={yy-MM-dd}&page={startPage}&size={endPage} | Queries the transactions ordered by descending “creation date” in a paginated table and filtered by amount and date |
 
 
-- ## Recipient A/C Creation
+- #### Recipient A/C Creation
 - Endpoint:/v1/account
 - Request
 ```
@@ -47,7 +60,7 @@ http status **201**
     "accountNo": "1885226712"
 }
 ```
-- ## Wallet to Account Transfer
+- #### Wallet to Account Transfer
 - Endpoint:/v1/transfer
 - Request
 ```
@@ -68,7 +81,7 @@ http status **201**
     "statusDescription": "Transaction Accepted for processing!"
 }
 ```
-- ## Query Transactions
+- #### Query Transactions
 - Endpoint:/v1/transfer
 - Request
 ```
