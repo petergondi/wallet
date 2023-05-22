@@ -38,7 +38,7 @@ This api is a simple simulation of a virtual wallet and how to transfer money fr
 
 - #### Recipient A/C Creation
 - Endpoint:/v1/account
-- Request
+- Request (POST)
 ```
 {
      "firstName":"Tony",
@@ -62,9 +62,8 @@ http status **201**
 ```
 - #### Wallet to Account Transfer
 - Endpoint:/v1/transfer
-- Request
+- Request (POST)
 ```
-http status **201**
 {
      "accountId":"54",
      "userId":"1000",
@@ -74,6 +73,7 @@ http status **201**
 ```
 - Response
 ```
+http status **201**
 {
     "transactionId": 253,
     "status": "RECEIVED",
@@ -81,11 +81,11 @@ http status **201**
     "statusDescription": "Transaction Accepted for processing!"
 }
 ```
--this request should make you see an extra message into the queue as shown below
+- This request should make you see an extra message into the queue as shown below
 ![System Diagram](https://i.postimg.cc/5yGnZmqR/Screenshot-2023-05-22-at-14-57-59.png)
 - #### Query Transactions
 - Endpoint:/v1/transfer
-- Request
+- Request (GET)
 ```
 /v1/transfer?amount=450&date=2023-05-21&page=0&size=10
 ```
