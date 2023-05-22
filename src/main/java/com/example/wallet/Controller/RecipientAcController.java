@@ -1,10 +1,8 @@
 package com.example.wallet.Controller;
 
-import com.example.wallet.Domain.AccountPayload.TransferPayload;
+
 import com.example.wallet.Domain.RecipientAccountDto;
-import com.example.wallet.Domain.ResponsePayload;
 import com.example.wallet.Service.RecipientAcService;
-import com.example.wallet.Service.RecipientAcServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
