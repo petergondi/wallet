@@ -14,10 +14,10 @@
 - 3.The wallet service persist the information to the database
 - 4.The wallet service then adds the request to the queue for bank account crediting
 - 5.The Event Driven Consumer consumes the message from the queue
-- 6. The Event Driven Consumer sends crediting request to the external bank transfer Api
-- 7. The Event Driven Consumer receives the request back of the crediting result
-- 8. The Event Driven Consumer updates the corresponding transaction in the database appropriately
-*Refund and Retrial Section(Not Handled for now)
+- 6.The Event Driven Consumer sends crediting request to the external bank transfer Api
+- 7.The Event Driven Consumer receives the request back of the crediting result
+- 8.The Event Driven Consumer updates the corresponding transaction in the database appropriately
+* Refund and Retrial Section(Not Handled for now)
 - Refunds are supposed to be done if any of process 4,5,6 or 7 fails
 - A retrial mechanism may also be implemented before a refund is done especially if process 6 fails
 ## 2.Api Description
