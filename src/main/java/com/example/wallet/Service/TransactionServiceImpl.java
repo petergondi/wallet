@@ -65,10 +65,11 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
     @Override
-    public ResponsePayload createResponsePayload(TransactionStatus status, String statusDescription, BigDecimal amount) {
+    public ResponsePayload createResponsePayload(TransactionStatus status, String statusDescription, BigDecimal amount,Long transactionId) {
         ResponsePayload responsePayload = new ResponsePayload();
         responsePayload.setStatus(status);
         responsePayload.setAmount(amount);
+        responsePayload.setTransactionId(transactionId);
         responsePayload.setStatusDescription(statusDescription);
         return responsePayload;
     }

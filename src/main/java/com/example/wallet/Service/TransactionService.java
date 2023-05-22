@@ -21,7 +21,7 @@ public interface TransactionService {
     @Transactional
     TransactionDto savePayment(TransferPayload transferPayload, WithdrawResponse withdrawResponse);
 
-    ResponsePayload createResponsePayload(TransactionStatus status, String statusDescription, BigDecimal amount);
+    ResponsePayload createResponsePayload(TransactionStatus status, String statusDescription, BigDecimal amount,Long transactionId);
 
     Page<TransactionDto> getFilteredTransactions(BigDecimal amount, LocalDate date, int page, int size);
 
