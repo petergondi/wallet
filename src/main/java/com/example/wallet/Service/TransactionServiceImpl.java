@@ -57,6 +57,7 @@ public class TransactionServiceImpl implements TransactionService {
             transactionDTO.setAmount(transferPayload.getAmount());
             transactionDTO.setUserId(transferPayload.getUserId());
             transactionDTO.setWalletTransactionId(withdrawResponse.getWalletTransactionId());
+            transactionDTO.setAccountId(transferPayload.getAccountId());
             transactionDTO.setStatus(TransactionStatus.RECEIVED);
             return transactionRepository.save(transactionDTO);
         }catch(Exception e){
