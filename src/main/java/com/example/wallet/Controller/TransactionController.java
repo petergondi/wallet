@@ -42,7 +42,7 @@ public class TransactionController {
 
             if (recipientAccountDto == null) {
                 return ResponseEntity.badRequest()
-                        .body(transactionService.createResponsePayload(TransactionStatus.REJECTED, "Transaction rejected A/C not found!", transferPayload.getAmount()));
+                        .body(transactionService.createResponsePayload(TransactionStatus.REJECTED, "Transaction rejected A/C not found!", transferPayload.getAmount(),null));
             }
 
             WithdrawResponse withdrawResponse = transactionService.withDrawWallet(transferPayload);
@@ -58,18 +58,18 @@ public class TransactionController {
 
                     if (insertToQueue) {
                         return ResponseEntity.ok()
-                                .body(transactionService.createResponsePayload(TransactionStatus.RECEIVED, "Transaction Accepted for processing!", transferPayload.getAmount()));
+                                .body(transactionService.createResponsePayload(TransactionStatus.RECEIVED, "Transaction Accepted for processing!", transferPayload.getAmount(),savedTransactionDto.getWalletTransactionId()));
                     } else {
                         return ResponseEntity.ok()
-                                .body(transactionService.createResponsePayload(TransactionStatus.REFUND, "Transaction failed refund initiated!", transferPayload.getAmount()));
+                                .body(transactionService.createResponsePayload(TransactionStatus.REFUND, "Transaction failed refund initiated!", transferPayload.getAmount(),savedTransactionDto.getWalletTransactionId()));
                     }
                 } else {
                     return ResponseEntity.ok()
-                            .body(transactionService.createResponsePayload(TransactionStatus.REFUND, "Transaction Could not be completed refund initiated!", transferPayload.getAmount()));
+                            .body(transactionService.createResponsePayload(TransactionStatus.REFUND, "Transaction Could not be completed refund initiated!", transferPayload.getAmount(),null));
                 }
             }
             return ResponseEntity.badRequest()
-                    .body(transactionService.createResponsePayload(TransactionStatus.FAILED, "Transaction Could not be processed refund initiated!", transferPayload.getAmount()));
+                    .body(transactionService.createResponsePayload(TransactionStatus.FAILED, "Transaction Could not be processed refund initiated!", transferPayload.getAmount(),null));
 
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
