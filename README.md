@@ -14,10 +14,10 @@
 - 3.The wallet service persist the information to the database
 - 4.The wallet service then adds the request to the queue for bank account crediting
 - 5.The Event Driven Consumer consumes the message from the queue
-- 6. The Event Driven Consumer sends crediting request to the external bank transfer Api
-- 7. The Event Driven Consumer receives the request back of the crediting result
-- 8. The Event Driven Consumer updates the corresponding transaction in the database appropriately
-*Refund and Retrial Section(Not Handled for now)
+- 6.The Event Driven Consumer sends crediting request to the external bank transfer Api
+- 7.The Event Driven Consumer receives the request back of the crediting result
+- 8.The Event Driven Consumer updates the corresponding transaction in the database appropriately
+* Refund and Retrial Section(Not Handled for now)
 - Refunds are supposed to be done if any of process 4,5,6 or 7 fails
 - A retrial mechanism may also be implemented before a refund is done especially if process 6 fails
 ## 2.Api Description
@@ -164,3 +164,50 @@ http status **200**
     "empty": false
 }
 ```
+# 3.Installation Guide
+This guide provides step-by-step instructions to install and run a Spring Boot application with a PostgreSQL database and ActiveMQ locally.
+- Prerequisite
+  Before proceeding with the installation, make sure you have the following prerequisites installed on your system:
+
+- Java Development Kit (JDK) 8 or later
+- Apache Maven
+- PostgreSQL database
+- ActiveMQ messaging broker
+## Installation Steps
+1) Clone the repository:
+```
+  git clone <repository url>
+```
+2) Configure the PostgreSQL database:
+   - Create a new database called **wallet** in PostgreSQL for the application.
+   - Update the database configuration in the application.properties file:
+```
+spring.datasource.url=jdbc:postgresql://localhost:5432/wallet
+spring.datasource.username=<database_username>
+spring.datasource.password=<database_password>
+
+```
+3) Configure ActiveMQ:
+  - Install and start the ActiveMQ messaging broker.
+  - Update the ActiveMQ configuration in the application.properties file:
+```
+spring.activemq.broker-url=tcp://localhost:61616
+```
+4) Build the application using Maven:
+```
+   mvn clean package
+
+ ```
+5) Run the application
+```
+java -jar target/<jar_file_name>.jar
+```
+6) You can now access the host through http://localhost:8080 and append the endpoints to send the request
+   i.e http://localhost:8080/v1/account
+
+# 4.Tools and Language Used for Development
+- Java 17
+- 3.1.0
+- Postgres Database
+- Git
+- ActiveMq(For queueing transactions)
