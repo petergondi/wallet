@@ -38,6 +38,16 @@ This api is a simple simulation of a virtual wallet and how to transfer money fr
 
 - #### Recipient A/C Creation
 - Endpoint:/v1/account
+- Field Descriptions
+
+| Field         | Description                  | required |
+|---------------|------------------------------|----------|
+| firstName     | recipient bank A/c firstname | Yes      |
+| lastName      | recipient bank A/C lastName  | Yes      |
+| routingNumber | Bank routing number          | Yes      |
+| nationalId    | recipient national id no     | Yes      |
+| accountNo     | recipient Bank A/C number    | Yes      |
+
 - Request
 ```
 {
@@ -63,6 +73,13 @@ http status **201**
 - #### Wallet to Account Transfer
 - Endpoint:/v1/transfer
 - Request
+- | Field     | Description                                                   | required |
+  |-----------|---------------------------------------------------------------|----------|
+  | accountId | accountId created when creating account                       | Yes      |
+  | userId    | userId identifying the owner of the wallet to debit or credit | Yes      |
+  | currency  | The currency to be used in transaction                        | Yes      |
+  | amount    | The amount to be transacted                                   | Yes      |
+  
 ```
 http status **201**
 {
