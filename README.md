@@ -192,6 +192,9 @@ spring.datasource.password=<database_password>
   - Update the ActiveMQ configuration in the application.properties file:
 ```
 spring.activemq.broker-url=tcp://localhost:61616
+spring.activemq.user=<user>
+spring.activemq.password=<password>
+spring.activemq.packages.trust-all=true
 ```
 4) Build the application using Maven:
 ```
