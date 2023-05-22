@@ -81,6 +81,8 @@ http status **201**
     "statusDescription": "Transaction Accepted for processing!"
 }
 ```
+-this request should make you see an extra message into the queue as shown below
+![System Diagram](https://i.postimg.cc/5yGnZmqR/Screenshot-2023-05-22-at-14-57-59.png)
 - #### Query Transactions
 - Endpoint:/v1/transfer
 - Request
