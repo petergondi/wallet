@@ -68,6 +68,7 @@ public class TransactionController {
                     .body(transactionService.createResponsePayload(TransactionStatus.FAILED, "Transaction Could not be processed refund initiated!", transferPayload.getAmount(),null));
 
         } catch (Exception e) {
+            LOGGER.error("An error occured while processing transaction"+e.getMessage())
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
