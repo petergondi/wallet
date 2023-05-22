@@ -44,18 +44,14 @@ public class TransactionController {
                 return ResponseEntity.badRequest()
                         .body(transactionService.createResponsePayload(TransactionStatus.REJECTED, "Transaction rejected A/C not found!", transferPayload.getAmount(),null));
             }
-
             WithdrawResponse withdrawResponse = transactionService.withDrawWallet(transferPayload);
 
             if (withdrawResponse != null) {
                 TransactionDto savedTransactionDto = transactionService.savePayment(transferPayload, withdrawResponse);
 
                 if (savedTransactionDto != null) {
-                    ResponsePayload responsePayload = new ResponsePayload();
-                    responsePayload.setTransactionId(savedTransactionDto.getWalletTransactionId());
                     transferPayload.setAmount(savedTransactionDto.getNewAmount());
                     boolean insertToQueue = transactionService.saveToQueue(savedTransactionDto, transferPayload, recipientAccountDto);
-
                     if (insertToQueue) {
                         return ResponseEntity.ok()
                                 .body(transactionService.createResponsePayload(TransactionStatus.RECEIVED, "Transaction Accepted for processing!", transferPayload.getAmount(),savedTransactionDto.getWalletTransactionId()));
