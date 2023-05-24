@@ -216,16 +216,23 @@ spring.activemq.user=<user>
 spring.activemq.password=<password>
 spring.activemq.packages.trust-all=true
 ```
-4) Build the application using Maven:
+4) Configure Ontop Accounts:
+```
+ontop.debit.account=<debit account>
+ontop.account.name=<account name>
+ontop.account.routingnumber=<routing number>
+ontop.account.currency=<currency>
+```
+5) Build the application using Maven:
 ```
    mvn clean package
 
  ```
-5) Run the application
+6) Run the application
 ```
 java -jar target/<jar_file_name>.jar
 ```
-6) You can now access the host through http://localhost:8080 and append the endpoints to send the request
+7) You can now access the host through http://localhost:8080 and append the endpoints to send the request
    i.e http://localhost:8080/v1/account
 ## Postman Collection Link
 https://interstellar-sunset-5393.postman.co/workspace/ds~6b5edbc7-d399-49f2-9c00-f3b47f2b8a22/collection/4932219-76120378-e128-4ea4-ab31-851c15a5e9e3?action=share&creator=4932219
